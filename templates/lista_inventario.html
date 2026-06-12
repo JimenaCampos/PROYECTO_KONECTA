@@ -1,0 +1,139 @@
+{% extends 'form_base.html' %}
+{% block title %} · Gestionar PCs{% endblock %}
+{% block content %}
+
+<div class="ph">
+  <div class="ph-left">
+    <h1>Gestionar PCs</h1>
+    <p>Inventario general de equipos de cómputo en plataforma</p>
+  </div>
+</div>
+
+<div class="metrics">
+  <div class="mcard blue"><div class="ml">Total PCs</div><div class="mv">{{ stock.total or 0 }}</div></div>
+  <div class="mcard green"><div class="ml">Operativas</div><div class="mv">{{ stock.operativas or 0 }}</div></div>
+  <div class="mcard warn"><div class="ml">En reparación</div><div class="mv">{{ stock.en_reparacion or 0 }}</div></div>
+  <div class="mcard red"><div class="ml">De baja</div><div class="mv">{{ stock.de_baja or 0 }}</div></div>
+</div>
+
+{% if error %}<div class="alert alert-e"><span>!</span> {{ error }}</div>{% endif %}
+{% if mensaje %}<div class="alert alert-s"><span>✓</span> {{ mensaje }}</div>{% endif %}
+
+<div class="inv-layout">
+
+  <!-- Tabla izquierda -->
+  <div class="inv-tabla">
+    <form class="filters" method="GET" action="{{ url_for('inventario', usuario_id=id_del_usuario) }}">
+      <input class="fc" type="text" name="q" placeholder="Buscar hostname, serie o modelo..." value="{{ q or '' }}">
+      <select class="fc" name="estado">
+        <option value="">Todos los estados</option>
+        <option value="operativa"     {% if estado_f=='operativa'     %}selected{% endif %}>Operativa</option>
+        <option value="en_reparacion" {% if estado_f=='en_reparacion' %}selected{% endif %}>En reparación</option>
+        <option value="de_baja"       {% if estado_f=='de_baja'       %}selected{% endif %}>De baja</option>
+      </select>
+      <select class="fc" name="area">
+        <option value="">Todas las áreas</option>
+        {% for a in areas %}
+        <option value="{{ a.id }}" {% if area_f==a.id|string %}selected{% endif %}>{{ a.nombre }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-p" type="submit">Filtrar</button>
+    </form>
+
+    <div class="twrap">
+      <div class="thd">
+        <h3>PCs registradas</h3>
+        <span class="pill pm">{{ total }} total</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Hostname</th><th>N.° Serie</th><th>Marca / modelo</th>
+            <th>Área</th><th>Estado</th><th>Técnico</th><th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% if pcs %}
+          {% for pc in pcs %}
+          <tr>
+            <td class="tmono tf">{{ pc.hostname }}</td>
+            <td class="tmut">{{ pc.numero_serie }}</td>
+            <td>{{ pc.marca_modelo or '—' }}</td>
+            <td>{{ pc.area_nombre or '—' }}</td>
+            <td>
+              {% if pc.estado == 'operativa' %}<span class="pill pg">Operativa</span>
+              {% elif pc.estado == 'en_reparacion' %}<span class="pill pa">En reparación</span>
+              {% else %}<span class="pill pr">De baja</span>{% endif %}
+            </td>
+            <td>{{ pc.tecnico_nombre or '—' }}</td>
+            <td><a href="{{ url_for('editar_pc', pc_id=pc.id, usuario_id=id_del_usuario) }}" class="al">Editar</a></td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="7"><div class="empty"><p>Sin resultados</p></div></td></tr>
+        {% endif %}
+        </tbody>
+      </table>
+      {% if total_pags > 1 %}
+      <div class="pagination">
+        {% if pagina > 1 %}<a href="{{ url_for('inventario', usuario_id=id_del_usuario, pagina=pagina-1, q=q or '', estado=estado_f or '', area=area_f or '') }}">‹</a>{% endif %}
+        {% for p in range(1, total_pags+1) %}
+          {% if p == pagina %}<span class="pg-active">{{ p }}</span>
+          {% else %}<a href="{{ url_for('inventario', usuario_id=id_del_usuario, pagina=p, q=q or '', estado=estado_f or '', area=area_f or '') }}">{{ p }}</a>{% endif %}
+        {% endfor %}
+        {% if pagina < total_pags %}<a href="{{ url_for('inventario', usuario_id=id_del_usuario, pagina=pagina+1, q=q or '', estado=estado_f or '', area=area_f or '') }}">›</a>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Formulario derecha — misma altura que la tabla -->
+  <div class="inv-form">
+    <div class="card inv-form-card">
+      <div class="card-hd"><h3>Registrar PC</h3></div>
+      <form method="POST" action="{{ url_for('nueva_pc', usuario_id=id_del_usuario) }}">
+        <div class="fg">
+          <label>Hostname <span class="req">*</span></label>
+          <input class="fc" type="text" name="hostname" placeholder="MV-PE-0001" required>
+        </div>
+        <div class="fg">
+          <label>N.° de serie <span class="req">*</span></label>
+          <input class="fc" type="text" name="numero_serie" placeholder="SN-DELL-00001" required>
+        </div>
+        <div class="fg">
+          <label>Marca / modelo <span class="opt">(opcional)</span></label>
+          <input class="fc" type="text" name="marca_modelo" placeholder="Dell OptiPlex 3080">
+        </div>
+        <div class="fg">
+          <label>Área</label>
+          <select class="fc" name="area_id">
+            <option value="">— Sin área —</option>
+            {% for a in areas %}<option value="{{ a.id }}">{{ a.nombre }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="fg">
+          <label>Estado</label>
+          <select class="fc" name="estado" required>
+            <option value="operativa">Operativa</option>
+            <option value="en_reparacion">En reparación</option>
+            <option value="de_baja">De baja</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Técnico responsable</label>
+          <select class="fc" name="tecnico_id">
+            <option value="">— Sin asignar —</option>
+            {% for t in tecnicos %}<option value="{{ t.id }}">{{ t.nombre }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="fg">
+          <label>Observaciones <span class="opt">(opcional)</span></label>
+          <textarea class="fc" name="observaciones" rows="3"></textarea>
+        </div>
+        <button class="btn btn-p" type="submit">Registrar PC</button>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

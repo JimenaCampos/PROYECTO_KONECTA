@@ -1,0 +1,72 @@
+{% extends 'form_base.html' %}
+{% block title %} · Áreas{% endblock %}
+{% block content %}
+
+<div class="ph">
+  <div class="ph-left">
+    <h1>Gestionar Áreas</h1>
+    <p>Unidades y departamentos de la organización</p>
+  </div>
+  <div class="ph-right">
+    <a href="{{ url_for('estructura', usuario_id=id_del_usuario) }}" class="btn">← Volver</a>
+  </div>
+</div>
+
+{% if error %}<div class="alert alert-e"><span>!</span> {{ error }}</div>{% endif %}
+{% if mensaje %}<div class="alert alert-s"><span>✓</span> {{ mensaje }}</div>{% endif %}
+
+<div class="two-col">
+
+  <div class="card">
+    <div class="card-hd"><h3>Registrar nueva área</h3></div>
+    <form action="{{ url_for('nueva_area', usuario_id=id_del_usuario) }}" method="POST">
+      <div class="fg">
+        <label>Nombre del área <span style="color:#B91C1C">*</span></label>
+        <input class="fc" type="text" name="nombre" placeholder="Ej. Tecnología de la Información" required>
+      </div>
+      <div class="fg">
+        <label>Responsable</label>
+        <input class="fc" type="text" name="responsable" placeholder="Nombre del responsable">
+      </div>
+      <div class="fg">
+        <label>Descripción</label>
+        <textarea class="fc" name="descripcion" rows="3" placeholder="Breve descripción del área..."></textarea>
+      </div>
+      <button class="btn btn-p" type="submit">Registrar área</button>
+    </form>
+  </div>
+
+  <div>
+    <div class="twrap">
+      <div class="thd"><h3>Áreas registradas ({{ areas|length }})</h3></div>
+      <table>
+        <thead>
+          <tr><th>Nombre</th><th>Responsable</th><th>PCs asignadas</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          {% if areas %}
+            {% for area in areas %}
+            <tr>
+              <td style="font-weight:600;">{{ area.nombre }}</td>
+              <td class="tmut">{{ area.responsable or '—' }}</td>
+              <td><span class="pill pm">{{ area.total_pcs }}</span></td>
+              <td>
+                {% if area.activa %}<span class="pill pg">Activa</span>
+                {% else %}<span class="pill pr">Inactiva</span>{% endif %}
+              </td>
+              <td>
+                <a href="{{ url_for('editar_area', usuario_id=id_del_usuario, area_id=area.id) }}" class="al">Editar</a>
+                <a href="{{ url_for('eliminar_area', usuario_id=id_del_usuario, area_id=area.id) }}" class="al al-red"
+                   onclick="return confirm('¿Eliminar el área {{ area.nombre }}?')">Eliminar</a>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="5"><div class="empty"><p>No hay áreas registradas</p></div></td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

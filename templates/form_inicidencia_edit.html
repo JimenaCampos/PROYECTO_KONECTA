@@ -1,0 +1,106 @@
+{% extends 'form_base.html' %}
+{% block title %} · Incidencia #{{ incidencia.id }}{% endblock %}
+{% block content %}
+<div class="ph">
+  <div class="ph-left">
+    <h1>Incidencia #{{ incidencia.id }}</h1>
+    <p>{{ incidencia.nombre_problema }} · {{ incidencia.usuario_nombre }}</p>
+  </div>
+  <div class="ph-right">
+    <a href="{{ url_for('lista_incidencias', usuario_id=id_del_usuario) }}" class="btn">← Volver</a>
+  </div>
+</div>
+
+{% if error %}<div class="alert alert-e"><span>!</span> {{ error }}</div>{% endif %}
+
+<div class="two-col">
+  <div>
+    <div class="card card-full">
+      <div class="card-hd">
+        <h3>{{ incidencia.titulo }}</h3>
+        {% if incidencia.prioridad=='Alto' or incidencia.prioridad=='ALTO' or incidencia.prioridad=='ALTA' %}<span class="pill pr">Alto</span>
+        {% elif incidencia.prioridad=='Medio' or incidencia.prioridad=='MEDIO' or incidencia.prioridad=='MEDIA' %}<span class="pill pa">Medio</span>
+        {% else %}<span class="pill pg">Bajo</span>{% endif %}
+      </div>
+      
+      <table style="font-size:13px;width:100%;border-collapse:collapse;">
+        <tr><td style="color:#555;padding:6px 0;width:130px;font-weight:600;">Problema</td><td>{{ incidencia.nombre_problema }}</td></tr>
+        <tr><td style="color:#555;padding:6px 0;font-weight:600;">Reportado por</td><td>{{ incidencia.usuario_nombre }}</td></tr>
+        <tr><td style="color:#555;padding:6px 0;font-weight:600;">Técnico</td><td>{{ incidencia.tecnico_nombre or '—' }}</td></tr>
+        <tr><td style="color:#555;padding:6px 0;font-weight:600;">Estado</td><td>
+          {% if incidencia.estado=='PENDIENTE' %}<span class="pill py">Pendiente</span>
+          {% elif incidencia.estado=='EN_DIAGNOSTICO' %}<span class="pill pa">En diagnóstico</span>
+          {% elif incidencia.estado=='PROGRAMADO' %}<span class="pill pb">Programado</span>
+          {% else %}<span class="pill pg">Resuelto</span>{% endif %}
+        </td></tr>
+        <tr><td style="color:#555;padding:6px 0;font-weight:600;">Apertura</td><td style="color:#888;">{{ incidencia.fecha_creacion.strftime('%d/%m/%Y %H:%M') if incidencia.fecha_creacion else '—' }}</td></tr>
+        {% if incidencia.fecha_cierre %}
+        <tr><td style="color:#555;padding:6px 0;font-weight:600;">Cierre</td><td style="color:#888;">{{ incidencia.fecha_cierre.strftime('%d/%m/%Y %H:%M') }}</td></tr>
+        {% endif %}
+      </table>
+
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid #eef0f5;">
+        <div style="font-size:11px;font-weight:700;color:#555;margin-bottom:5px;">Descripción</div>
+        <div style="font-size:13px;line-height:1.6;">{{ incidencia.descripcion }}</div>
+      </div>
+      
+      {% if incidencia.diagnostico %}
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid #eef0f5;">
+        <div style="font-size:11px;font-weight:700;color:#555;margin-bottom:5px;">Diagnóstico</div>
+        <div style="font-size:13px;line-height:1.6;">{{ incidencia.diagnostico }}</div>
+      </div>
+      {% endif %}
+      
+      {% if incidencia.solucion %}
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid #eef0f5;">
+        <div style="font-size:11px;font-weight:700;color:#555;margin-bottom:5px;">Solución aplicada</div>
+        <div style="font-size:13px;line-height:1.6;">{{ incidencia.solucion }}</div>
+      </div>
+      {% endif %}
+    </div>
+  </div> 
+  <div>
+    {% if rol_del_usuario=='JEFE_TI' %}
+    <div class="card">
+      <div class="card-hd"><h3>Asignar técnico</h3></div>
+      <form action="{{ url_for('asignar_tecnico_incidencia', usuario_id=id_del_usuario) }}" method="POST" style="display:flex;gap:8px;">
+        <input type="hidden" name="idIncidencia" value="{{ incidencia.id }}">
+        <select class="fc" name="tecnico_id" style="flex:1;">
+          <option value="">— Selecciona técnico —</option>
+          {% for t in tecnicos %}
+          <option value="{{ t.id }}" {% if incidencia.tecnico_id==t.id %}selected{% endif %}>{{ t.nombre }}</option>
+          {% endfor %}
+        </select>
+        <button class="btn btn-p" type="submit">Asignar</button>
+      </form>
+    </div>
+    {% endif %}
+
+    {% if rol_del_usuario in ['TECNICO','JEFE_TI'] %}
+    <div class="card">
+      <div class="card-hd"><h3>Modificar estado</h3></div>
+      <form action="{{ url_for('actualizar_estado_incidencia', usuario_id=id_del_usuario) }}" method="POST">
+        <input type="hidden" name="idIncidencia" value="{{ incidencia.id }}">
+        <div class="fg">
+          <label>Estado</label>
+          <select class="fc" name="estado">
+            {% for e,lbl in [('PENDIENTE','Pendiente'),('EN_DIAGNOSTICO','En diagnóstico'),('PROGRAMADO','Programado'),('RESUELTO','Resuelto')] %}
+            <option value="{{ e }}" {% if incidencia.estado==e %}selected{% endif %}>{{ lbl }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="fg">
+          <label>Diagnóstico</label>
+          <textarea class="fc" name="diagnostico" rows="3" placeholder="¿Qué se encontró al revisar?">{{ incidencia.diagnostico or '' }}</textarea>
+        </div>
+        <div class="fg">
+          <label>Solución aplicada</label>
+          <textarea class="fc" name="solucion" rows="3" placeholder="¿Qué se hizo para resolver?">{{ incidencia.solucion or '' }}</textarea>
+        </div>
+        <button class="btn btn-p" type="submit">Guardar cambios</button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

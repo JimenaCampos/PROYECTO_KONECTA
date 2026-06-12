@@ -1,0 +1,168 @@
+{% extends 'form_base.html' %}
+{% block title %} · Dashboard Estadístico{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_Incidencias.css') }}">
+
+<div class="ph">
+  <div class="ph-left">
+    <h1>Dashboard Estratégico</h1>
+    <p>Módulo de Analítica Estratégica — Control Interno Konecta</p>
+  </div>
+  {% if user.rol_nombre != 'JEFE_TI' %}
+  <div class="ph-right">
+    <a href="{{ url_for('cargar_formulario_incidencia', usuario_id=id_del_usuario) }}" class="btn btn-p">+ Registrar incidencia</a>
+  </div>
+  {% endif %}
+</div>
+
+<div class="btn-export-group">
+  <button onclick="exportarTablaExcel()" class="btn-exp btn-ex-excel">
+    Exportar a Excel
+  </button>
+  <button onclick="exportarTablaPDF()" class="btn-exp btn-ex-pdf">
+    Exportar Reporte PDF
+  </button>
+</div>
+
+<div id="reporte-bloque-completo">
+
+  <div class="report-print-header" style="display: none; margin-bottom: 35px; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; border-bottom: 3px double #3b82f6; padding-bottom: 15px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+      <div>
+        <h2 style="margin: 0; color: #1e3a8a; font-size: 24px; font-weight: 700; letter-spacing: 0.3px;">
+          KONECTA • SISTEMA DE GESTIÓN DE INCIDENCIAS
+        </h2>
+        <p style="margin: 3px 0 0 0; font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 600;">
+          Sede Chiclayo — Módulo de Analítica Estratégica
+        </p>
+      </div>
+      <div style="text-align: right; font-size: 12px; color: #4b5563; line-height: 1.4;">
+        <strong>Fecha de Emisión:</strong> 24/05/2026<br>
+        <strong>Hora de Generación:</strong> 01:21 AM<br>
+        <span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; display: inline-block; margin-top: 5px;">
+          Documento Oficial TI
+        </span>
+      </div>
+    </div>
+
+    <div style="background-color: #f8fafc; border-left: 4px solid #3b82f6; padding: 10px 15px; border-radius: 0 6px 6px 0;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #334155;">
+        <tr>
+          <td style="padding: 3px 0; width: 50%;">
+            <strong>ID del Operador:</strong> #{{ id_del_usuario }}
+          </td>
+          <td style="padding: 3px 0; width: 50%;">
+            <strong>Rango del Análisis:</strong> 
+            {% if proyeccion and proyeccion|length > 0 %}
+              Desde <span style="color: #2563eb; font-weight: 600;">{{ proyeccion[0].periodo }}</span> hasta <span style="color: #2563eb; font-weight: 600;">{{ proyeccion[-1].periodo }}</span>
+            {% else %}
+              Historial Completo Registrado
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 3px 0;">
+            <strong>Métrica de Control:</strong> Tendencia Mensual y Proyección Lineal de Demanda
+          </td>
+          <td style="padding: 3px 0;">
+            <strong>Sistema de Datos:</strong> Persistencia Relacional PyMySQL (Estándar DictCursor)
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="metrics" style="margin-bottom: 25px;">
+    <div class="mcard blue"><div class="ml">Total tickets</div><div class="mv">{{ resumen.total or 0 }}</div></div>
+    <div class="mcard warn"><div class="ml">Pendientes</div><div class="mv">{{ resumen.pendientes or 0 }}</div></div>
+    <div class="mcard blue"><div class="ml">En proceso</div><div class="mv">{{ resumen.en_proceso or 0 }}</div></div>
+    <div class="mcard green"><div class="ml">Resueltos</div><div class="mv">{{ resumen.resueltos or 0 }}</div></div>
+  </div>
+
+  <div class="analytics-grid-main">
+    <div class="analytics-card">
+      <h3>Tendencia Mensual y Proyección Lineal</h3>
+      <div class="canvas-container-proyeccion">
+        <canvas id="chartProyeccion"></canvas>
+      </div>
+    </div>
+
+    <div class="analytics-card">
+      <h3>Carga de Trabajo por Técnico</h3>
+      <div class="canvas-container-tecnicos">
+        <canvas id="chartTecnicos"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="analytics-card-full">
+    <h3>Volumen por Tipo de Problema (Matriz de Pareto)</h3>
+    <div class="canvas-container-tipos">
+      <canvas id="chartTipos"></canvas>
+    </div>
+  </div>
+
+  <div class="twrap">
+    <div class="thd">
+      <h3>Historial de Tickets Recientes</h3>
+      <a href="{{ url_for('lista_incidencias', usuario_id=id_del_usuario) }}" class="btn btn-sm">Ver todos</a>
+    </div>
+    
+    <table id="tabla-exportable-datos">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Título</th>
+          <th>Problema</th>
+          <th>Prioridad</th>
+          <th>Técnico Asignado</th>
+          <th>Estado</th>
+          <th>Fecha Creación</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% if incidencias %}
+        {% for t in incidencias %}
+        <tr>
+          <td class="tmut">#{{ t.id }}</td>
+          <td style="font-weight:600; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ t.titulo }}</td>
+          <td>{{ t.nombre_problema }}</td>
+          <td>
+            {% if t.prioridad == 'ALTA' or t.prioridad == 'Alto' or t.prioridad == 'ALTA' %}<span class="pill pr">Alta</span>
+            {% elif t.prioridad == 'MEDIA' or t.prioridad == 'Medio' or t.prioridad == 'MEDIA' %}<span class="pill pa">Media</span>
+            {% else %}<span class="pill pg">Baja</span>{% endif %}
+          </td>
+          <td>{{ t.tecnico_nombre or '—' }}</td>
+          <td>
+            {% if t.estado == 'PENDIENTE' %}<span class="pill py">Pendiente</span>
+            {% elif t.estado == 'EN_DIAGNOSTICO' %}<span class="pill pa">En diagnóstico</span>
+            {% elif t.estado == 'PROGRAMADO' %}<span class="pill pb">Programado</span>
+            {% else %}<span class="pill pg">Resuelto</span>{% endif %}
+          </td>
+          <td class="tmut">{{ t.fecha_creacion.strftime('%d/%m %H:%M') if t.fecha_creacion else '—' }}</td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr><td colspan="7"><div class="empty"><p>Sin tickets registrados aún</p></div></td></tr>
+      {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<div id="data-dashboard-backend" 
+     data-proyeccion='{{ proyeccion | tojson | safe if proyeccion else "[]" }}'
+     data-tecnico='{{ por_tecnico | tojson | safe if por_tecnico else "[]" }}'
+     data-tipo='{{ por_tipo | tojson | safe if por_tipo else "[]" }}'
+     style="display: none;">
+</div>
+
+<script src="{{ url_for('static', filename='js/dashboard_Incidencias.js') }}"></script>
+
+{% endblock %}

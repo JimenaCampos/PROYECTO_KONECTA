@@ -1,0 +1,70 @@
+{% extends 'form_base.html' %}
+{% block title %} · Editar PC — {{ pc.hostname }}{% endblock %}
+{% block content %}
+<div class="ph">
+  <div class="ph-left">
+    <h1>Editar PC — {{ pc.hostname }}</h1>
+    <p>{{ pc.numero_serie }}</p>
+  </div>
+  <div class="ph-right">
+    <a href="{{ url_for('inventario', usuario_id=id_del_usuario) }}" class="btn">← Volver</a>
+  </div>
+</div>
+
+{% if error %}<div class="alert alert-e"><span>!</span> {{ error }}</div>{% endif %}
+
+<div class="card" style="max-width:580px;margin:0 auto;">
+  <form action="{{ url_for('editar_pc', pc_id=pc.id, usuario_id=id_del_usuario) }}" method="POST">
+    <div class="fg2">
+      <div class="fg">
+        <label>Hostname <span style="color:#B91C1C">*</span></label>
+        <input class="fc" type="text" name="hostname" value="{{ pc.hostname }}" required>
+      </div>
+      <div class="fg">
+        <label>N.° de serie <span style="color:#B91C1C">*</span></label>
+        <input class="fc" type="text" name="numero_serie" value="{{ pc.numero_serie }}" required>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Marca / modelo</label>
+      <input class="fc" type="text" name="marca_modelo" value="{{ pc.marca_modelo }}">
+    </div>
+    <div class="fg2">
+      <div class="fg">
+        <label>Área</label>
+        <select class="fc" name="area_id">
+          <option value="">— Sin área —</option>
+          {% for a in areas %}
+          <option value="{{ a.id }}" {% if pc.area_id==a.id %}selected{% endif %}>{{ a.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="fg">
+        <label>Estado</label>
+        <select class="fc" name="estado" required>
+          <option value="operativa"     {% if pc.estado=='operativa' %}selected{% endif %}>Operativa</option>
+          <option value="en_reparacion" {% if pc.estado=='en_reparacion' %}selected{% endif %}>En reparación</option>
+          <option value="de_baja"       {% if pc.estado=='de_baja' %}selected{% endif %}>De baja</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Técnico responsable</label>
+      <select class="fc" name="tecnico_id">
+        <option value="">— Sin asignar —</option>
+        {% for t in tecnicos %}
+        <option value="{{ t.id }}" {% if pc.tecnico_id==t.id %}selected{% endif %}>{{ t.nombre }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="fg">
+      <label>Observaciones <span class="opt">(opcional)</span></label>
+      <textarea class="fc" name="observaciones" rows="3">{{ pc.observaciones or '' }}</textarea>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-p" type="submit">Guardar cambios</button>
+      <a href="{{ url_for('inventario', usuario_id=id_del_usuario) }}" class="btn">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

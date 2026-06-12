@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Konecta · Iniciar sesión</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/konecta.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login_facial.css') }}">
+</head>
+<body class="login-page">
+
+<script>
+  window.FACE_API_URL   = "{{ url_for('static', filename='js/face-api.min.js') }}";
+  window.FACE_MODEL_URL = "{{ url_for('static', filename='face_models') }}";
+</script>
+
+<div class="login-box">
+
+  <div class="login-brand">
+    <div>
+      <div class="lb-logo">
+        <div class="lb-lbox">K</div>
+        <div>
+          <div class="lb-ltxt">Konecta · Inventarios</div>
+          <div class="lb-lsub">Sede Chiclayo — Movistar Perú</div>
+        </div>
+      </div>
+      <div class="lb-tag">
+        <h2>Gestiona el <span>inventario</span> de forma inteligente</h2>
+        <p>Control total de equipos, incidencias y mantenimientos desde una sola plataforma.</p>
+      </div>
+    </div>
+    <div class="lb-roles">
+      <p>Roles del sistema</p>
+      <div class="lb-rrow">
+        <span class="pill py">COLABORADOR</span>
+        <div class="lb-rd">Reporta incidencias y consulta el estado de sus incidencias</div>
+      </div>
+      <div class="lb-rrow">
+        <span class="pill pb">TÉCNICO</span>
+        <div class="lb-rd">Gestiona inventario, incidencias y mantenimiento</div>
+      </div>
+      <div class="lb-rrow">
+        <span class="pill pm">JEFE TI</span>
+        <div class="lb-rd">Acceso completo + reportes + administración de usuarios</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="login-form-wrap">
+    <h3>Bienvenido</h3>
+    <p class="sub">Ingresa con tu cuenta asignada</p>
+
+    {% if mensaje %}
+    <div class="alert alert-s"><span>✓</span> {{ mensaje }}</div>
+    {% endif %}
+    {% if error %}
+    <div class="alert alert-e"><span>!</span> {{ error }}</div>
+    {% endif %}
+
+    <!-- Tabs -->
+    <div class="lf-tabs">
+      <button class="lf-tab active" id="tab-pwd"  onclick="switchTab('pwd')">Contrasena</button>
+      <button class="lf-tab"        id="tab-face" onclick="switchTab('face')">Reconocimiento facial</button>
+    </div>
+
+    <!-- Panel: contraseña -->
+    <div id="panel-pwd">
+      <form id="form-login" action="{{ url_for('login') }}" method="POST">
+        <div class="fg">
+          <label for="usuario">Usuario</label>
+          <input class="fc" type="text" id="usuario" name="usuario"
+                 placeholder="Tu nombre de usuario" autocomplete="username" required>
+        </div>
+        <div class="fg">
+          <label for="password">Contraseña</label>
+          <input class="fc" type="password" id="password" name="password"
+                 placeholder="••••••••" autocomplete="current-password" required>
+        </div>
+        <button class="btn-full" type="submit">Ingresar al sistema</button>
+      </form>
+      <div class="login-footer">
+        No tienes cuenta? <a href="{{ url_for('registrarse') }}">Registrate como colaborador</a>
+      </div>
+    </div>
+
+    <!-- Panel: facial -->
+    <div id="panel-face" style="display:none">
+      <div id="face-status" class="lf-status lf-status-wait">
+        Activa la camara para identificarte
+      </div>
+      <div class="lf-cam-wrap" id="lf-cam-wrap" style="display:none">
+        <video id="face-video" autoplay muted playsinline></video>
+        <canvas id="face-overlay"></canvas>
+      </div>
+      <div id="lf-loader" class="lf-loader" style="display:none">
+        <div class="lf-spinner"></div>
+        <span id="lf-loader-msg">Cargando modelos...</span>
+      </div>
+      <div class="lf-btns">
+        <button class="btn-full" id="btn-camara" onclick="iniciarCamara()">
+          Activar camara
+        </button>
+        <button class="btn-full lf-btn-stop" id="btn-detener"
+                onclick="detenerCamara()" style="display:none">
+          Detener camara
+        </button>
+      </div>
+      <div id="face-resultado" class="lf-resultado" style="display:none">
+        <div id="face-nombre" class="lf-resultado-nombre"></div>
+        <button class="btn-full lf-btn-confirmar" id="btn-confirmar" onclick="confirmarLogin()">
+          Confirmar ingreso
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/login.js') }}"></script>
+</body>
+</html>

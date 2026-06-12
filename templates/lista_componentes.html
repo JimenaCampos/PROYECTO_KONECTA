@@ -1,0 +1,105 @@
+{% extends 'form_base.html' %}
+{% block title %} · Gestionar componentes{% endblock %}
+{% block content %}
+
+<div class="ph">
+  <div class="ph-left">
+    <h1>Gestionar componentes</h1>
+    <p>Inventario general de piezas y repuestos en almacén</p>
+  </div>
+</div>
+
+{% if error %}<div class="alert alert-e"><span>!</span> {{ error }}</div>{% endif %}
+{% if mensaje %}<div class="alert alert-s"><span>✓</span> {{ mensaje }}</div>{% endif %}
+
+<div class="inv-layout">
+
+  <!-- Tabla izquierda -->
+  <div class="inv-tabla">
+    <form class="filters" method="GET" action="{{ url_for('componentes', usuario_id=id_del_usuario) }}">
+      <input class="fc" type="text" name="q" placeholder="Buscar componente..." value="{{ q or '' }}">
+      <select class="fc" name="tipo">
+        <option value="">Todos los tipos</option>
+        <option value="Periférico" {% if tipo_f=='Periférico' %}selected{% endif %}>Periférico</option>
+        <option value="Hardware"   {% if tipo_f=='Hardware'   %}selected{% endif %}>Hardware</option>
+        <option value="Cable"      {% if tipo_f=='Cable'      %}selected{% endif %}>Cable</option>
+        <option value="Otro"       {% if tipo_f=='Otro'       %}selected{% endif %}>Otro</option>
+      </select>
+      <button class="btn btn-p" type="submit">Filtrar</button>
+    </form>
+
+    <div class="twrap">
+      <div class="thd">
+        <h3>Componentes en almacén</h3>
+        <span class="pill pm">{{ total }} total</span>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Nombre</th><th>Tipo</th><th>Stock</th><th>Descripción</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+        {% if componentes %}
+          {% for c in componentes %}
+          <tr>
+            <td class="tf">{{ c.nombre }}</td>
+            <td><span class="pill py">{{ c.tipo }}</span></td>
+            <td>
+              {% if c.cantidad <= 2 %}<span class="pill pr">{{ c.cantidad }}</span>
+              {% elif c.cantidad <= 5 %}<span class="pill pa">{{ c.cantidad }}</span>
+              {% else %}<span class="pill pg">{{ c.cantidad }}</span>{% endif %}
+            </td>
+            <td class="tmut">{{ c.descripcion or '—' }}</td>
+            <td><a href="{{ url_for('editar_componente', comp_id=c.id, usuario_id=id_del_usuario) }}" class="al">Editar</a></td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="5"><div class="empty"><p>Sin componentes registrados</p></div></td></tr>
+        {% endif %}
+        </tbody>
+      </table>
+      {% if total_pags > 1 %}
+      <div class="pagination">
+        {% if pagina > 1 %}<a href="{{ url_for('componentes', usuario_id=id_del_usuario, pagina=pagina-1, q=q or '', tipo=tipo_f or '') }}">‹</a>{% endif %}
+        {% for p in range(1, total_pags+1) %}
+          {% if p == pagina %}<span class="pg-active">{{ p }}</span>
+          {% else %}<a href="{{ url_for('componentes', usuario_id=id_del_usuario, pagina=p, q=q or '', tipo=tipo_f or '') }}">{{ p }}</a>{% endif %}
+        {% endfor %}
+        {% if pagina < total_pags %}<a href="{{ url_for('componentes', usuario_id=id_del_usuario, pagina=pagina+1, q=q or '', tipo=tipo_f or '') }}">›</a>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Formulario derecha — misma altura -->
+  <div class="inv-form">
+    <div class="card inv-form-card">
+      <div class="card-hd"><h3>Registrar componente</h3></div>
+      <form action="{{ url_for('nuevo_componente', usuario_id=id_del_usuario) }}" method="POST">
+        <div class="fg">
+          <label>Nombre <span class="req">*</span></label>
+          <input class="fc" type="text" name="nombre" placeholder="Ej: Teclado USB" required>
+        </div>
+        <div class="fg">
+          <label>Tipo</label>
+          <select class="fc" name="tipo">
+            <option value="Periférico">Periférico</option>
+            <option value="Hardware">Hardware</option>
+            <option value="Cable">Cable</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Cantidad inicial</label>
+          <input class="fc" type="number" name="cantidad" value="0" min="0" required>
+        </div>
+        <div class="fg">
+          <label>Descripción <span class="opt">(opcional)</span></label>
+          <textarea class="fc" name="descripcion" rows="3"></textarea>
+        </div>
+        <button class="btn btn-p" type="submit">Registrar</button>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

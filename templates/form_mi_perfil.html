@@ -1,0 +1,102 @@
+{% extends 'form_base.html' %}
+{% block title %} · Mi perfil{% endblock %}
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login_facial.css') }}">
+
+<div class="ph"><div class="ph-left"><h1>Mi perfil</h1><p>Modifica tus datos o cambia tu contraseña</p></div></div>
+{% if error %}<div class="alert alert-e"><span>!</span> {{ error }}</div>{% endif %}
+{% if mensaje %}<div class="alert alert-s"><span>✓</span> {{ mensaje }}</div>{% endif %}
+
+<div class="two-col">
+  <div>
+    <div class="card">
+      <div class="card-hd"><h3>Modificar datos</h3></div>
+      <form action="{{ url_for('mi_perfil', usuario_id=id_del_usuario) }}" method="POST">
+        <input type="hidden" name="accion" value="datos">
+        <div class="fg"><label>Nombre completo</label>
+          <input class="fc" type="text" name="nombre" value="{{ user.nombre }}" required></div>
+        <div class="fg"><label>Correo electrónico</label>
+          <input class="fc" type="email" name="correo" value="{{ user.correo }}" required></div>
+        <div class="fg"><label>Celular <span class="opt">(opcional)</span></label>
+          <input class="fc" type="text" name="celular" value="{{ user.celular or '' }}"></div>
+        <button class="btn btn-p" type="submit">Guardar datos</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><h3>Cambiar contraseña</h3></div>
+      <form id="form-cambio" action="{{ url_for('mi_perfil', usuario_id=id_del_usuario) }}" method="POST">
+        <input type="hidden" name="accion" value="password">
+        <div class="fg"><label>Contraseña actual</label>
+          <input class="fc" type="password" name="password_actual"></div>
+        <div class="fg"><label>Nueva contraseña</label>
+          <input class="fc" type="password" name="password_nueva" placeholder="Minimo 6 caracteres"></div>
+        <div class="fg"><label>Confirmar nueva contraseña</label>
+          <input class="fc" type="password" name="password_confirmacion"></div>
+        <button class="btn btn-d" type="submit">Cambiar contraseña</button>
+      </form>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <div class="card-hd">
+        <h3>Reconocimiento facial</h3>
+        {% if user.descriptor_facial %}
+          <span class="pill pg">Registrado</span>
+        {% else %}
+          <span class="pill py">Sin registrar</span>
+        {% endif %}
+      </div>
+
+      {% if user.descriptor_facial %}
+      <div class="alert alert-i">
+        <span>i</span> Ya tienes un rostro registrado. Puedes actualizarlo capturando uno nuevo.
+      </div>
+      {% else %}
+      <div class="alert alert-w">
+        <span>!</span> Sin rostro registrado. Registralo para poder ingresar con reconocimiento facial.
+      </div>
+      {% endif %}
+
+      <div class="facial-reg-wrap">
+        <div id="facial-status" class="facial-feedback">
+          Activa la camara para registrar tu rostro.
+        </div>
+        <div class="facial-cam-wrap" id="facial-cam-wrap" style="display:none">
+          <video id="facial-video" autoplay muted playsinline></video>
+          <canvas id="facial-overlay"></canvas>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <button type="button" class="btn btn-sm btn-p"
+                  id="btn-facial-cam" onclick="iniciarCamaraRegistro()">
+            Activar camara
+          </button>
+          <button type="button" class="btn btn-sm btn-p"
+                  id="btn-facial-capturar" onclick="capturarDescriptor()" style="display:none">
+            Capturar rostro
+          </button>
+          <button type="button" class="btn btn-sm"
+                  id="btn-facial-stop" onclick="detenerCamaraRegistro()" style="display:none">
+            Cancelar
+          </button>
+          {% if user.descriptor_facial %}
+          <button type="button" class="btn btn-sm btn-r" onclick="eliminarFacial()">
+            Eliminar rostro
+          </button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.FACE_API_URL   = "{{ url_for('static', filename='js/face-api.min.js') }}";
+  window.FACE_MODEL_URL = "{{ url_for('static', filename='face_models') }}";
+  window.USUARIO_ID_FAC = {{ id_del_usuario }};
+</script>
+<script src="{{ url_for('static', filename='js/facial_registro.js') }}"></script>
+
+{% endblock %}

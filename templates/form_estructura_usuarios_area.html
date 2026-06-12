@@ -1,0 +1,79 @@
+
+{% extends 'form_base.html' %}
+{% block title %} · Usuarios por Área{% endblock %}
+{% block content %}
+
+<div class="ph">
+  <div class="ph-left">
+    <h1>Usuarios por Área</h1>
+    <p>Asigna cada usuario a su área de trabajo</p>
+  </div>
+  <div class="ph-right">
+    <a href="{{ url_for('estructura', usuario_id=id_del_usuario) }}" class="btn">← Volver</a>
+  </div>
+</div>
+
+{% if error %}<div class="alert alert-e"><span>!</span> {{ error }}</div>{% endif %}
+{% if mensaje %}<div class="alert alert-s"><span>✓</span> {{ mensaje }}</div>{% endif %}
+
+<div class="two-col">
+
+  <div class="card">
+    <div class="card-hd"><h3>Nueva asignación</h3></div>
+    <form action="{{ url_for('asignar_area_usuario', usuario_id=id_del_usuario) }}" method="POST">
+      <div class="fg">
+        <label>Usuario <span style="color:#B91C1C">*</span></label>
+        <select class="fc" name="usuario_id" required>
+          <option value="">— Selecciona usuario —</option>
+          {% for u in usuarios %}
+          <option value="{{ u.id }}">{{ u.nombre }} · {{ u.rol_nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="fg">
+        <label>Área <span style="color:#B91C1C">*</span></label>
+        <select class="fc" name="area_id" required>
+          <option value="">— Sin área —</option>
+          {% for a in areas %}
+          <option value="{{ a.id }}">{{ a.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button class="btn btn-p" type="submit">Guardar asignación</button>
+    </form>
+  </div>
+
+  <div>
+    <div class="twrap">
+      <div class="thd"><h3>Usuarios registrados ({{ usuarios|length }})</h3></div>
+      <table>
+        <thead>
+          <tr><th>Usuario</th><th>Rol</th><th>Área asignada</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          {% if usuarios %}
+            {% for u in usuarios %}
+            <tr>
+              <td style="font-weight:600;">{{ u.nombre }}</td>
+              <td>
+                {% if u.rol_nombre == 'JEFE_TI' %}<span class="pill pm">Jefe TI</span>
+                {% elif u.rol_nombre == 'TECNICO' %}<span class="pill pb">Técnico</span>
+                {% else %}<span class="pill py">Colaborador</span>{% endif %}
+              </td>
+              <td>{{ u.area_nombre or '—' }}</td>
+              <td>
+                <a href="{{ url_for('editar_usuario_area', usuario_id=id_del_usuario, id_usuario_destino=u.id) }}" class="al">Editar</a>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="4"><div class="empty"><p>Sin usuarios registrados en el sistema</p></div></td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+

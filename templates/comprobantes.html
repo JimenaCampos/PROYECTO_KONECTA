@@ -1,0 +1,134 @@
+{% extends 'form_base.html' %}
+{% block title %} · Comprobantes{% endblock %}
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/comprobantes.css') }}">
+
+<div class="ph">
+  <div class="ph-left">
+    <h1>Comprobantes de Pago</h1>
+    <p>Registra y administra los comprobantes de venta</p>
+  </div>
+</div>
+
+{% if error %}<div class="alert alert-e"><span>!</span> {{ error }}</div>{% endif %}
+{% if mensaje %}<div class="alert alert-s"><span>✓</span> {{ mensaje }}</div>{% endif %}
+
+<div class="card" style="margin-bottom: 20px;">
+  <div class="card-hd"><h3>Registrar comprobante</h3></div>
+  <div style="padding: 16px 20px;">
+    <form action="{{ url_for('nuevo_comprobante', usuario_id=id_del_usuario) }}" method="POST">
+
+      <h5>Datos del comprobante</h5>
+      <div class="form-grid form-grid-2">
+        <div class="form-field">
+          <label for="tipo_comprobante_id">Tipo de comprobante <span style="color:#B91C1C">*</span></label>
+          <select id="tipo_comprobante_id" name="tipo_comprobante_id" class="fc" required>
+            <option value="">Seleccione</option>
+            {% for tipo in tipos_comprobante %}
+              <option value="{{ tipo.id }}">{{ tipo.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="fecha_emision">Fecha de emisión <span style="color:#B91C1C">*</span></label>
+          <input type="date" id="fecha_emision" name="fecha_emision" class="fc" required>
+        </div>
+      </div>
+
+      <h5>Datos del cliente</h5>
+      <div class="form-grid form-grid-3">
+        <div class="form-field">
+          <label for="cliente_nombre">Nombre del cliente <span style="color:#B91C1C">*</span></label>
+          <input type="text" id="cliente_nombre" name="cliente_nombre" class="fc" required>
+        </div>
+        <div class="form-field">
+          <label for="cliente_documento">Documento <span style="color:#B91C1C">*</span></label>
+          <input type="text" id="cliente_documento" name="cliente_documento" class="fc" required>
+        </div>
+        <div class="form-field">
+          <label for="cliente_telefono">Teléfono <span class="opt">(opcional)</span></label>
+          <input type="text" id="cliente_telefono" name="cliente_telefono" class="fc" maxlength="9">
+        </div>
+      </div>
+
+      <h5>Datos de la Venta</h5>
+      <div class="form-grid form-grid-4">
+        <div class="form-field">
+          <label for="producto_servicio">Producto / Servicio <span style="color:#B91C1C">*</span></label>
+          <input type="text" id="producto_servicio" name="producto_servicio" class="fc" placeholder="Internet Hogar" required>
+        </div>
+        <div class="form-field">
+          <label for="plan">Plan <span style="color:#B91C1C">*</span></label>
+          <input type="text" id="plan" name="plan" class="fc" placeholder="Fibra 100 Mbps" required>
+        </div>
+        <div class="form-field">
+          <label for="monto">Monto <span style="color:#B91C1C">*</span></label>
+          <input type="number" id="monto" name="monto" class="fc" step="0.01" min="0" placeholder="0.00" required>
+        </div>
+        <div class="form-field">
+          <label for="asesor_venta">Asesor de venta <span class="opt">(opcional)</span></label>
+          <input type="text" id="asesor_venta" name="asesor_venta" class="fc" placeholder="Nombre del asesor">
+        </div>
+      </div>
+
+      <div class="form-grid form-grid-1" style="margin-top: 4px;">
+        <div class="form-field">
+          <label for="observacion">Observación <span class="opt">(opcional)</span></label>
+          <textarea id="observacion" name="observacion" class="fc" rows="2" placeholder="Detalle adicional..."></textarea>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; margin-top:12px;">
+        <button type="submit" class="btn btn-p">Registrar comprobante</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<div class="twrap">
+  <div class="thd">
+    <h3>Lista de comprobantes</h3>
+    <span class="pill pm">{{ comprobantes|length }} registrados</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Tipo</th>
+        <th>Fecha</th>
+        <th>Cliente</th>
+        <th>Documento</th>
+        <th>Producto</th>
+        <th>Plan</th>
+        <th>Monto</th>
+        <th>Asesor</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if comprobantes %}
+        {% for c in comprobantes %}
+        <tr>
+          <td class="tmut">#{{ c.id }}</td>
+          <td><span class="pill pb">{{ c.tipo_comprobante }}</span></td>
+          <td class="tmut">{{ c.fecha_emision }}</td>
+          <td style="font-weight:600;">{{ c.cliente_nombre }}</td>
+          <td class="tmut">{{ c.cliente_documento }}</td>
+          <td>{{ c.producto_servicio }}</td>
+          <td>{{ c.plan }}</td>
+          <td style="font-weight:700;">S/ {{ '%.2f'|format(c.monto) }}</td>
+          <td class="tmut">{{ c.asesor_venta or '—' }}</td>
+          <td><span class="pill pg">{{ c.estado }}</span></td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr><td colspan="10"><div class="empty"><p>No hay comprobantes registrados aún</p></div></td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+<script src="{{ url_for('static', filename='js/comprobante.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Konecta · Crear cuenta</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/konecta.css') }}">
+</head>
+<body class="login-page">
+<div class="login-box">
+
+  <div class="login-brand">
+    <div>
+      <div class="lb-logo">
+        <div class="lb-lbox">PJ</div>
+        <div>
+          <div class="lb-ltxt">Sistema de Incidencias</div>
+          <div class="lb-lsub">Sede Chiclayo</div>
+        </div>
+      </div>
+      <div class="lb-tag">
+        <h2>Crea tu <span>cuenta</span> de colaborador</h2>
+        <p>Con tu cuenta podrás reportar incidencias de tu equipo y hacer seguimiento en tiempo real.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="login-form-wrap">
+    <h3>Crear cuenta</h3>
+    <p class="sub">Completa tus datos para registrarte</p>
+
+    {% if error %}
+    <div class="alert alert-e"><span>!</span> {{ error }}</div>
+    {% endif %}
+
+    <form id="form-registro" action="{{ url_for('registrarse') }}" method="POST">
+      <div class="fg">
+        <label for="nombre">Nombre completo <span style="color:#B91C1C">*</span></label>
+        <input class="fc" type="text" id="nombre" name="nombre" placeholder="Ej: Carlos Ruiz Pérez">
+        <div class="fb" style="display:none;font-size:11px;color:#B91C1C;margin-top:3px;"></div>
+      </div>
+      <div class="fg">
+        <label for="correo">Correo electrónico <span style="color:#B91C1C">*</span></label>
+        <input class="fc" type="email" id="correo" name="correo" placeholder="correo@konecta.pe">
+        <div class="fb" style="display:none;font-size:11px;color:#B91C1C;margin-top:3px;"></div>
+      </div>
+      <div class="fg2">
+        <div class="fg">
+          <label for="usuario">Nombre de usuario <span style="color:#B91C1C">*</span></label>
+          <input class="fc" type="text" id="usuario" name="usuario" placeholder="Ej: cruiz" autocomplete="off">
+          <div class="fb" style="display:none;font-size:11px;color:#B91C1C;margin-top:3px;"></div>
+        </div>
+        <div class="fg">
+          <label for="celular">Celular <span class="opt">(opcional)</span></label>
+          <input class="fc" type="text" id="celular" name="celular" placeholder="Ej: 944111222">
+        </div>
+      </div>
+      <div class="fg">
+        <label for="password">Contraseña <span style="color:#B91C1C">*</span></label>
+        <input class="fc" type="password" id="password" name="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+        <div class="fb" style="display:none;font-size:11px;color:#B91C1C;margin-top:3px;"></div>
+      </div>
+      <div class="alert alert-i" style="font-size:12px;">
+        <span>ℹ</span> Tu cuenta será creada con el rol <strong>COLABORADOR</strong>. Para otros roles contacta al Jefe TI.
+      </div>
+      <button class="btn-full" type="submit">Crear mi cuenta</button>
+    </form>
+
+    <div class="login-footer">
+      ¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Iniciar sesión</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

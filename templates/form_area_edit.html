@@ -1,0 +1,45 @@
+{% extends 'form_base.html' %}
+{% block title %} · Editar Área{% endblock %}
+{% block content %}
+
+<div class="ph">
+  <div class="ph-left">
+    <h1>Editar Área</h1>
+    <p>{{ area.nombre }}</p>
+  </div>
+  <div class="ph-right">
+    <a href="{{ url_for('estructura_areas', usuario_id=id_del_usuario) }}" class="btn">← Volver</a>
+  </div>
+</div>
+
+{% if error %}<div class="alert alert-e"><span>!</span> {{ error }}</div>{% endif %}
+
+<div class="card" style="max-width:520px; margin:0 auto;">
+  <form action="{{ url_for('editar_area', usuario_id=id_del_usuario, area_id=area.id) }}" method="POST">
+    <div class="fg">
+      <label>Nombre del área <span style="color:#B91C1C">*</span></label>
+      <input class="fc" type="text" name="nombre" value="{{ area.nombre }}" required>
+    </div>
+    <div class="fg">
+      <label>Responsable</label>
+      <input class="fc" type="text" name="responsable" value="{{ area.responsable or '' }}">
+    </div>
+    <div class="fg">
+      <label>Descripción</label>
+      <textarea class="fc" name="descripcion" rows="3">{{ area.descripcion or '' }}</textarea>
+    </div>
+    <div class="fg">
+      <label>Estado</label>
+      <select class="fc" name="activa">
+        <option value="1" {% if area.activa %}selected{% endif %}>Activa</option>
+        <option value="0" {% if not area.activa %}selected{% endif %}>Inactiva</option>
+      </select>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-p" type="submit">Guardar cambios</button>
+      <a href="{{ url_for('estructura_areas', usuario_id=id_del_usuario) }}" class="btn">Cancelar</a>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

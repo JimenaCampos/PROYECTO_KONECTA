@@ -1,0 +1,67 @@
+{% extends 'form_base.html' %}
+{% block title %} · Inicio{% endblock %}
+{% block content %}
+<div class="ph">
+  <div class="ph-left"><h1>Inicio</h1><p>Bienvenido, {{ user.nombre }}</p></div>
+  {% if user.rol_nombre != 'JEFE_TI' %}
+  <div class="ph-right">
+    <a href="{{ url_for('cargar_formulario_incidencia', usuario_id=id_del_usuario) }}" class="btn btn-p">+ Registrar incidencia</a>
+  </div>
+  {% endif %}
+</div>
+
+{% if user.rol_nombre in ['TECNICO','JEFE_TI'] %}
+<div class="metrics">
+  <div class="mcard blue"><div class="ml">Total</div><div class="mv">{{ resumen.total or 0 }}</div></div>
+  <div class="mcard warn"><div class="ml">Pendientes</div><div class="mv">{{ resumen.pendientes or 0 }}</div></div>
+  <div class="mcard blue"><div class="ml">En proceso</div><div class="mv">{{ resumen.en_proceso or 0 }}</div></div>
+  <div class="mcard green"><div class="ml">Resueltos</div><div class="mv">{{ resumen.resueltos or 0 }}</div></div>
+</div>
+<div class="metrics" style="grid-template-columns:repeat(3,1fr);">
+  <div class="mcard green"><div class="ml">PCs operativas</div><div class="mv">{{ stock.operativas or 0 }}</div></div>
+  <div class="mcard warn"><div class="ml">En reparación</div><div class="mv">{{ stock.en_reparacion or 0 }}</div></div>
+  <div class="mcard red"><div class="ml">De baja</div><div class="mv">{{ stock.de_baja or 0 }}</div></div>
+</div>
+{% else %}
+<div class="alert alert-i"><span>ℹ</span> Puedes registrar incidencias y consultar su estado.</div>
+{% endif %}
+
+<div class="twrap">
+  <div class="thd">
+    <h3>{% if user.rol_nombre=='COLABORADOR' %}Mis incidencias recientes{% else %}Incidencias recientes{% endif %}</h3>
+    <a href="{{ url_for('lista_incidencias', usuario_id=id_del_usuario) }}" class="btn btn-sm">Ver todas</a>
+  </div>
+  <table>
+    <thead>
+      <tr><th>#</th><th>Título</th><th>Problema</th><th>Prioridad</th><th>Técnico</th><th>Estado</th><th>Fecha</th><th></th></tr>
+    </thead>
+    <tbody>
+    {% if incidencias %}
+      {% for t in incidencias %}
+      <tr>
+        <td class="tmut">#{{ t.id }}</td>
+        <td style="font-weight:600;">{{ t.titulo }}</td>
+        <td>{{ t.nombre_problema }}</td>
+        <td>
+          {% if t.prioridad=='Alto' %}<span class="pill pr">Alto</span>
+          {% elif t.prioridad=='Medio' %}<span class="pill pa">Medio</span>
+          {% else %}<span class="pill pg">Bajo</span>{% endif %}
+        </td>
+        <td>{{ t.tecnico_nombre or '—' }}</td>
+        <td>
+          {% if t.estado=='PENDIENTE' %}<span class="pill py">Pendiente</span>
+          {% elif t.estado=='EN_DIAGNOSTICO' %}<span class="pill pa">En diagnóstico</span>
+          {% elif t.estado=='PROGRAMADO' %}<span class="pill pb">Programado</span>
+          {% else %}<span class="pill pg">Resuelto</span>{% endif %}
+        </td>
+        <td class="tmut">{{ t.fecha_creacion.strftime('%d/%m %H:%M') if t.fecha_creacion else '—' }}</td>
+        <td><a href="{{ url_for('ver_detalle_incidencia', usuario_id=id_del_usuario, idIncidencia=t.id) }}" class="al">Ver</a></td>
+      </tr>
+      {% endfor %}
+    {% else %}
+      <tr><td colspan="8"><div class="empty"><p>Sin incidencias registradas aún</p></div></td></tr>
+    {% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

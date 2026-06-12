@@ -1,0 +1,39 @@
+{% extends 'form_base.html' %}
+{% block title %} · Editar Área de Usuario{% endblock %}
+{% block content %}
+
+<div class="ph">
+  <div class="ph-left">
+    <h1>Editar Área de Usuario</h1>
+    <p>{{ user.nombre }}</p>
+  </div>
+  <div class="ph-right">
+    <a href="{{ url_for('estructura_usuarios_area', usuario_id=id_del_usuario) }}" class="btn">← Volver</a>
+  </div>
+</div>
+
+{% if error %}<div class="alert alert-e"><span>!</span> {{ error }}</div>{% endif %}
+
+<div class="card" style="max-width:520px; margin:0 auto;">
+  <form action="{{ url_for('editar_usuario_area', usuario_id=id_del_usuario, id_usuario=user.id) }}" method="POST">
+    <div class="fg">
+      <label>Usuario</label>
+      <input class="fc" type="text" value="{{ user.nombre }} · {{ user.rol_nombre }}" disabled>
+    </div>
+    <div class="fg">
+      <label>Área asignada</label>
+      <select class="fc" name="area_id">
+        <option value="">— Sin área —</option>
+        {% for a in areas %}
+        <option value="{{ a.id }}" {% if user.area_id == a.id %}selected{% endif %}>{{ a.nombre }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-p" type="submit">Guardar cambios</button>
+      <a href="{{ url_for('estructura_usuarios_area', usuario_id=id_del_usuario) }}" class="btn">Cancelar</a>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

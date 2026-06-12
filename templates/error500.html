@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Konecta · Error 500</title>
+  <style>
+    body { font-family:'Segoe UI',Arial,sans-serif; background:#f4f6fb; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
+    .card { background:#fff; padding:2.5rem; border-radius:12px; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.1); max-width:420px; border-top:6px solid #ef4444; }
+    .icon { font-size:3.5rem; margin-bottom:1rem; }
+    h2 { color:#b91c1c; margin-bottom:.5rem; }
+    p { color:#555; margin-bottom:2rem; font-size:14px; line-height:1.6; }
+    .btn { display:inline-block; padding:.8rem 1.5rem; background:#2563eb; color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; }
+    .btn:hover { background:#1d4ed8; }
+    .code { display:block; margin-top:1.2rem; font-family:monospace; color:#999; font-size:12px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">🖥️💥</div>
+    <h2>Error interno del servidor</h2>
+    <p>Ocurrió un problema al procesar tu solicitud en el sistema Konecta. El equipo de TI ya fue notificado. Intenta nuevamente en unos momentos.</p>
+    <a href="{{ url_for('login') }}" class="btn">Ir al inicio</a>
+    <span class="code">Error 500 · Konecta Sistema de Inventarios</span>
+  </div>
+</body>
+</html>

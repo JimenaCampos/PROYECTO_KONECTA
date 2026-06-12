@@ -1,0 +1,50 @@
+{% extends 'form_base.html' %}
+{% block title %} · Editar componente{% endblock %}
+{% block content %}
+<div class="ph">
+  <div class="ph-left">
+    <h1>Editar componente</h1>
+    <p>{{ comp.nombre }}</p>
+  </div>
+  <div class="ph-right">
+    <a href="{{ url_for('componentes', usuario_id=id_del_usuario) }}" class="btn">← Volver</a>
+  </div>
+</div>
+
+{% if error %}<div class="alert alert-e"><span>!</span> {{ error }}</div>{% endif %}
+
+<div class="card" style="max-width:520px;margin:0 auto;">
+  <form action="{{ url_for('editar_componente', comp_id=comp.id, usuario_id=id_del_usuario) }}" method="POST">
+    
+    <div class="fg">
+      <label>Nombre <span style="color:#B91C1C">*</span></label>
+      <input class="fc" type="text" name="nombre" value="{{ comp.nombre }}" required>
+    </div>
+    
+    <div class="fg2">
+      <div class="fg">
+        <label>Tipo</label>
+        <select class="fc" name="tipo">
+          {% for t in ['Periférico','Hardware','Cable','Otro'] %}
+          <option value="{{ t }}" {% if comp.tipo==t %}selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="fg">
+        <label>Cantidad en stock</label>
+        <input class="fc" type="number" name="cantidad" value="{{ comp.cantidad }}" min="0">
+      </div>
+    </div>
+    
+    <div class="fg">
+      <label>Descripción <span class="opt">(opcional)</span></label>
+      <textarea class="fc" name="descripcion" rows="2">{{ comp.descripcion or '' }}</textarea>
+    </div>
+    
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-p" type="submit">Guardar cambios</button>
+      <a href="{{ url_for('componentes', usuario_id=id_del_usuario) }}" class="btn">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

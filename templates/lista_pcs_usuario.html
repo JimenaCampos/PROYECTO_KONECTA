@@ -1,0 +1,80 @@
+{% extends 'form_base.html' %}
+{% block title %} · PCs por Usuario{% endblock %}
+{% block content %}
+
+<div class="ph">
+  <div class="ph-left">
+    <h1>PCs por Usuario</h1>
+    <p>Asigna cada equipo a su usuario responsable</p>
+  </div>
+  <div class="ph-right">
+    <a href="{{ url_for('estructura', usuario_id=id_del_usuario) }}" class="btn">← Volver</a>
+  </div>
+</div>
+
+{% if error %}<div class="alert alert-e"><span>!</span> {{ error }}</div>{% endif %}
+{% if mensaje %}<div class="alert alert-s"><span>✓</span> {{ mensaje }}</div>{% endif %}
+
+<div class="two-col">
+
+  <!-- Formulario nueva asignación -->
+  <div class="card">
+    <div class="card-hd"><h3>Nueva asignación</h3></div>
+    <form action="{{ url_for('asignar_usuario_pc', usuario_id=id_del_usuario) }}" method="POST">
+      <div class="fg">
+        <label>PC <span style="color:#B91C1C">*</span></label>
+        <select class="fc" name="pc_id" required>
+          <option value="">— Selecciona PC —</option>
+          {% for pc in pcs %}
+          <option value="{{ pc.id }}">{{ pc.hostname }} — {{ pc.marca_modelo or '' }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="fg">
+        <label>Usuario asignado</label>
+        <select class="fc" name="usuario_id">
+          <option value="">— Sin usuario —</option>
+          {% for u in usuarios %}
+          <option value="{{ u.id }}">{{ u.nombre }} · {{ u.rol_nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button class="btn btn-p" type="submit">Guardar asignación</button>
+    </form>
+  </div>
+
+  <!-- Lista -->
+  <div>
+    <div class="twrap">
+      <div class="thd"><h3>PCs registradas ({{ pcs|length }})</h3></div>
+      <table>
+        <thead>
+          <tr><th>Hostname</th><th>Área</th><th>Estado</th><th>Usuario asignado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          {% if pcs %}
+            {% for pc in pcs %}
+            <tr>
+              <td class="tmono" style="font-weight:600;">{{ pc.hostname }}</td>
+              <td class="tmut">{{ pc.area_nombre or '—' }}</td>
+              <td>
+                {% if pc.estado == 'operativa' %}<span class="pill pg">Operativa</span>
+                {% elif pc.estado == 'en_reparacion' %}<span class="pill pa">En reparación</span>
+                {% else %}<span class="pill pr">De baja</span>{% endif %}
+              </td>
+              <td>{{ pc.usuario_nombre or '—' }}</td>
+              <td>
+                <a href="{{ url_for('editar_pc_usuario', usuario_id=id_del_usuario, pc_id=pc.id) }}" class="al">Editar</a>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="5"><div class="empty"><p>Sin PCs registradas</p></div></td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

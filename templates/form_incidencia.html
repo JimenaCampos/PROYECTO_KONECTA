@@ -1,0 +1,74 @@
+{% extends 'form_base.html' %}
+{% block title %} · Registrar incidencia{% endblock %}
+{% block content %}
+<div class="ph">
+  <div class="ph-left">
+    <h1>Registrar incidencia</h1>
+    <p>El técnico será asignado automáticamente y recibirá tu reporte</p>
+  </div>
+  <div class="ph-right">
+    <a href="{{ url_for('lista_incidencias', usuario_id=id_del_usuario) }}" class="btn">← Volver</a>
+  </div>
+</div>
+
+{% if error %}
+<div class="alert alert-e"><span>!</span> {{ error }}</div>
+{% endif %}
+
+<div class="card card-md">
+  <form action="{{ url_for('guardar_incidencia', usuario_id=id_del_usuario) }}" method="POST">
+
+    <input type="hidden" name="usuario_id" value="{{ id_del_usuario }}">
+
+    <div class="fg">
+      <label>Título <span class="req">*</span></label>
+      <input class="fc" type="text" name="titulo" placeholder="Describe brevemente el problema" required>
+    </div>
+
+    <div class="fg2">
+      <div class="fg">
+        <label>Tipo de problema <span class="req">*</span></label>
+        <select class="fc" name="tipo_incidencia_id" required>
+          <option value="">— Selecciona —</option>
+          {% for i in tipos %}
+          <option value="{{ i.id }}">{{ i.nombre_problema }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="fg">
+        <label>Prioridad</label>
+        <select class="fc" name="prioridad">
+          <option value="Bajo">Bajo</option>
+          <option value="Medio" selected>Medio</option>
+          <option value="Alto">Alto</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="fg2">
+      <div class="fg">
+        <label>Ambiente <span class="opt">(letra del ambiente)</span></label>
+        <input class="fc" type="text" name="ambiente" maxlength="10"
+               placeholder="Ej: A, B, C..." value="{{ request.form.get('ambiente','') }}">
+      </div>
+      <div class="fg">
+        <label>IP del equipo <span class="opt">(opcional)</span></label>
+        <input class="fc" type="text" name="ip_equipo" maxlength="20"
+               placeholder="Ej: 192.168.1.10" value="{{ request.form.get('ip_equipo','') }}">
+      </div>
+    </div>
+
+    <div class="fg">
+      <label>Descripción detallada <span class="req">*</span></label>
+      <textarea class="fc" name="descripcion" rows="5"
+                placeholder="Qué ocurre, cuándo empezó, con qué frecuencia..." required></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-p" type="submit">Enviar incidencia</button>
+      <a href="{{ url_for('lista_incidencias', usuario_id=id_del_usuario) }}" class="btn">Cancelar</a>
+    </div>
+
+  </form>
+</div>
+{% endblock %}

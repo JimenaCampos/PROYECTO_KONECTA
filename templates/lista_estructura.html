@@ -1,0 +1,76 @@
+{% extends 'form_base.html' %}
+{% block title %} · Estructura Organizacional{% endblock %}
+{% block content %}
+
+<div class="ph">
+  <div class="ph-left">
+    <h1>Estructura Organizacional</h1>
+    <p>Gestión de áreas, usuarios y equipos de la organización</p>
+  </div>
+</div>
+
+<div class="three-col">
+
+  <div class="card">
+    <div class="card-hd"><h3>Áreas</h3></div>
+    <p style="font-size:13px; color:var(--g600); margin-bottom:16px;">
+      Unidades y departamentos de la organización
+    </p>
+    <a href="{{ url_for('estructura_areas', usuario_id=id_del_usuario) }}" class="btn btn-p">Gestionar áreas</a>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><h3>Usuarios por área</h3></div>
+    <p style="font-size:13px; color:var(--g600); margin-bottom:16px;">
+      Asigna cada usuario a su área de trabajo
+    </p>
+    <a href="{{ url_for('estructura_usuarios_area', usuario_id=id_del_usuario) }}" class="btn btn-p">Gestionar asignaciones</a>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><h3>PCs por usuario</h3></div>
+    <p style="font-size:13px; color:var(--g600); margin-bottom:16px;">
+      Asigna cada PC a su usuario responsable
+    </p>
+    <a href="{{ url_for('estructura_pcs_usuario', usuario_id=id_del_usuario) }}" class="btn btn-p">Gestionar asignaciones</a>
+  </div>
+
+</div>
+
+<div class="twrap">
+  <div class="thd"><h3>Áreas registradas ({{ areas|length }})</h3></div>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Área</th>
+        <th>Responsable</th>
+        <th>PCs asignadas</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if areas %}
+        {% for area in areas %}
+        <tr>
+          <td class="tmut">{{ loop.index }}</td>
+          <td style="font-weight:600;">{{ area.nombre }}</td>
+          <td class="tmut">{{ area.responsable or '—' }}</td>
+          <td><span class="pill pm">{{ area.total_pcs }}</span></td>
+          <td>
+            {% if area.activa %}
+            <span class="pill pg">Activa</span>
+            {% else %}
+            <span class="pill pr">Inactiva</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr><td colspan="5"><div class="empty"><p>No hay áreas registradas</p></div></td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
