@@ -1,0 +1,88 @@
+/* =====================================================================
+   dashboard reportes incidencias (CAMPOS JIMENA)
+   ===================================================================== */
+
+#reporte-bloque-completo {
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #ffffff;
+}
+
+
+.btn-export-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: flex-end; 
+}
+
+.btn-exp {
+    padding: 0.5rem 1rem;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    transition: opacity 0.2s;
+}
+
+.btn-exp:hover { 
+    opacity: 0.9; 
+}
+
+.btn-ex-excel { 
+    background-color: #27ae60; 
+}
+
+.btn-ex-pdf { 
+    background-color: #e74c3c; 
+}
+
+.fila-proyeccion {
+    background-color: rgba(241, 196, 15, 0.12) !important;
+    font-weight: bold;
+    color: #e67e22 !important; 
+}
+
+.analytics-grid-main {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.analytics-card {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid #e3e6f0;
+}
+
+.analytics-card-full {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid #e3e6f0;
+    margin-bottom: 25px;
+}
+
+.analytics-card h3, 
+.analytics-card-full h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    color: #333333;
+}
+
+/* Contenedores de dimensiones fijas para Chart.js */
+.canvas-container-proyeccion,
+.canvas-container-tecnicos {
+    height: 260px;
+    position: relative;
+}
+
+.canvas-container-tipos {
+    height: 240px;
+    position: relative;
+}

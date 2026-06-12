@@ -1,0 +1,151 @@
+/* ══ TABS DE LOGIN ═══════════════════════════════════════ */
+.lf-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  background: #f3f4f6;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 20px;
+}
+.lf-tab {
+  padding: 9px 8px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.lf-tab.active {
+  background: #fff;
+  color: #185FA5;
+  box-shadow: 0 1px 4px rgba(0,0,0,.1);
+}
+.lf-tab:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+/* ══ STATUS ══════════════════════════════════════════════ */
+.lf-status {
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+.lf-status-wait     { background: #f3f4f6; color: #555; }
+.lf-status-scanning { background: #eff6ff; color: #1d4ed8; }
+.lf-status-found    { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+.lf-status-warn     { background: #fffbeb; color: #92400e; }
+.lf-status-error    { background: #fef2f2; color: #991b1b; }
+
+/* ══ CÁMARA ══════════════════════════════════════════════ */
+.lf-cam-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: #111;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.lf-cam-wrap video,
+.lf-cam-wrap canvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.lf-cam-wrap canvas { pointer-events: none; }
+
+/* ══ LOADER ══════════════════════════════════════════════ */
+.lf-loader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 12px;
+}
+.lf-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #185FA5;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ══ BOTONES ═════════════════════════════════════════════ */
+.lf-btns { margin-bottom: 10px; }
+.lf-btn-stop {
+  background: #f3f4f6;
+  color: #444;
+  border: 1px solid #e5e7eb;
+}
+.lf-btn-stop:hover { background: #e5e7eb; }
+
+/* ══ RESULTADO ═══════════════════════════════════════════ */
+.lf-resultado {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 8px;
+}
+.lf-resultado-nombre {
+  font-size: 15px;
+  font-weight: 600;
+  color: #166534;
+  margin-bottom: 10px;
+  text-align: center;
+}
+.lf-btn-confirmar {
+  background: #16a34a;
+  color: #fff;
+  border: none;
+}
+.lf-btn-confirmar:hover { background: #15803d; }
+
+/* ══ REGISTRO FACIAL EN PERFIL ═══════════════════════════ */
+.facial-reg-wrap {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 10px;
+}
+.facial-cam-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: #111;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+.facial-cam-wrap video,
+.facial-cam-wrap canvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.facial-cam-wrap canvas { pointer-events: none; }
+.facial-feedback {
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  background: #f3f4f6;
+  color: #555;
+}
