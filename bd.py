@@ -1,18 +1,15 @@
 import pymysql.cursors
 
-# ── Conexión — igual al docente ────────────────────────────────
 def obtenerconexion():
     try:
         connection = pymysql.connect(
-            host='localhost',
-            user='root',
-            password='',
-            database='bd_konecta',
+            host='JimenaCampos.mysql.pythonanywhere-services.com',
+            user='JimenaCampos',
+            password='Aitana27*',  
+            database='JimenaCampos$bd_konecta',
             cursorclass=pymysql.cursors.DictCursor
         )
         return connection
-    except:
-        return None
-
-
-
+    except Exception as e:
+        # Esto va a obligar a Python a escupir el error matemático/servidor exacto
+        raise Exception(f"Error de conexión detallado: {e}")
